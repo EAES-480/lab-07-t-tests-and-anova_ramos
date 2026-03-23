@@ -12,10 +12,10 @@ output:
     code_folding: hide
     df_print: paged
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
-```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+```{r setup, echo=FALSE, message=FALSE, warning=T}
 library(tidyverse)
 library(lubridate)
 library(janitor)
@@ -63,19 +63,19 @@ By the end of this lab, you should be able to:
 
 ## Load and inspect
 
-```{r load_data, echo=TRUE, eval=FALSE}
+```{r load_data, echo=TRUE, eval=T}
 # GOAL: Read the dataset and keep 2022–2023.
 
 df <- read_csv("data/us-ams-simple.csv", na = c("-9999")) %>%
   clean_names() %>%
-  filter(year_local %in% c(___, ___))
+  filter(year_local %in% c(2022, 2023))
 
 glimpse(df)
 ```
 
 ## Derive time columns if needed
 
-```{r derive_time, echo=TRUE, eval=FALSE}
+```{r derive_time, echo=TRUE, eval=T}
 # GOAL: Create date / month columns if they do not already exist.
 
 df <- df %>%
@@ -101,13 +101,13 @@ Examples:
 - `le`
 - `fc`
 
-```{r choose_one_sample, echo=TRUE, eval=FALSE}
-target_year <- ___
-target_var  <- "___"
+```{r choose_one_sample, echo=TRUE, eval=T}
+target_year <- 2022
+target_var  <- "ta"
 
 sample_data <- df %>%
   filter(year_local == target_year) %>% 
-  slice_sample(n = ___)
+  slice_sample(n = 5000)
 
 x <- sample_data[[target_var]]
 
@@ -115,6 +115,7 @@ mean(x, na.rm = TRUE); sd(x, na.rm = TRUE); length(x)
 ```
 
 > What variable and day did you choose, and why?
+> *I chose Air Temperature (ta) because I used the same variable in previous labs, and now I want to compare it with the 2022 data.*
 
 ---
 
@@ -128,9 +129,9 @@ Examples:
 
 Fill in:
 
-> $H_0$: `___`
+> $H_0$: $\mu = 11$
 
-> $H_A$: `___`
+> $H_A$: $\mu \neq 11$
 
 ---
 
@@ -140,8 +141,8 @@ Use:
 
 $t = (\bar{x} - \mu_0) / (s / \sqrt{n})$
 
-```{r one_sample_manual, echo=TRUE, eval=FALSE}
-mu0 <- ___
+```{r one_sample_manual, echo=TRUE, eval=T}
+mu0 <- 11
 
 xbar <- mean(x, na.rm = TRUE)
 s <- sd(x, na.rm = TRUE)
@@ -155,8 +156,8 @@ t_stat
 
 ## 4) Compute the p-value and degrees of freedom
 
-```{r one_sample_pvalue, echo=TRUE, eval=FALSE}
-df_t <- ___
+```{r one_sample_pvalue, echo=TRUE, eval=T}
+df_t <- n - 1
 
 p_value <- 2 * pt(-abs(t_stat), df = df_t)
 
@@ -171,16 +172,18 @@ tibble(
 ```
 
 > What does the p-value suggest about your null hypothesis?
+> *The p-value is extremely small, so I can reject the null hypothesis. This suggests that the true mean ta is statistically significantly different from my hypothesized value of 11.*
 
 ---
 
 ## 5) Compare with `t.test()`
 
-```{r one_sample_ttest, echo=TRUE, eval=FALSE}
+```{r one_sample_ttest, echo=TRUE, eval=T}
 t.test(x, mu = mu0)
 ```
 
 > Does the `t.test()` output agree with your manual calculation? If not, why might that be?
+> *Yes, they agree. The manual calculation and the automatic output both resulted in the same t-statistic and degrees of freedom.*
 
 ---
 
@@ -192,13 +195,13 @@ Choose:
 - the **same variable**
 - two different **day ranges in 2023**
 
-```{r choose_two_sample, echo=TRUE, eval=FALSE}
+```{r choose_two_sample, echo=TRUE, eval=T}
 x1 <- df %>%
-  filter(year_local == 2023, doy > ___ & doy < ___) %>%
+  filter(year_local == 2023, doy > 95 & doy < 97) %>%
   pull(target_var)
 
 x2 <- df %>%
-  filter(year_local == 2023, doy > ___ & doy < ___) %>%
+  filter(year_local == 2023, doy > 194 & doy < 196) %>%
   pull(target_var)
 
 mean(x1, na.rm = TRUE); sd(x1, na.rm = TRUE); length(x1)
@@ -206,12 +209,11 @@ mean(x2, na.rm = TRUE); sd(x2, na.rm = TRUE); length(x2)
 ```
 
 > Why did you choose these two days?
-
----
+> *To compare seasonal temperature differences between spring and summer, so I can see if there is a statistically significant shift.*
 
 ## 7) Summarize the difference in means
 
-```{r two_sample_summary, echo=TRUE, eval=FALSE}
+```{r two_sample_summary, echo=TRUE, eval=T}
 xbar1 <- mean(x1, na.rm = TRUE)
 xbar2 <- mean(x2, na.rm = TRUE)
 
@@ -234,7 +236,7 @@ tibble(
 
 ## 8) Compute the two-sample t-statistic manually (Welch)
 
-```{r two_sample_manual, echo=TRUE, eval=FALSE}
+```{r two_sample_manual, echo=TRUE, eval=T}
 se_diff <- sqrt((s1^2 / n1) + (s2^2 / n2))
 
 t_stat <- mean_diff / se_diff
@@ -254,22 +256,26 @@ tibble(
 ```
 
 > What does the sign of `mean_diff` mean? What does the p-value mean?
+> *The negative sign means that the average spring temperature is lower than the average summer temperature. The extremely small p-value means that this difference is statistically significant.*
 
 ---
 
 ## 9) Compare with `t.test()`
 
-```{r two_sample_ttest, echo=TRUE, eval=FALSE}
+```{r two_sample_ttest, echo=TRUE, eval=T}
 t.test(x1, x2)
 ```
 
 > Does the automated t-test agree with your manual result?
+> *Yes, they agree.*
 
 ---
 
 ## 10) Visualize the two groups
 
-```{r two_sample_plot, echo=TRUE, eval=FALSE}
+```{r two_sample_plot, echo=TRUE, eval=T}
+day_range1 <- "95_97"
+day_range2 <- "194_196"
 plot_df <- bind_rows(
   tibble(group = paste0("DOY_", day_range1), value = x1),
   tibble(group = paste0("DOY_", day_range2), value = x2)
@@ -286,6 +292,7 @@ ggplot(plot_df, aes(x = group, y = value, fill = group)) +
 ```
 
 > Does the plot match your statistical conclusion?
+> *Yes. The boxplot shows that the summer box is higher on the y-axis than the spring box, with almost no overlap. This visual separation confirms the significant difference detected by the t-test.*
 
 ---
 
@@ -295,14 +302,14 @@ ggplot(plot_df, aes(x = group, y = value, fill = group)) +
 
 Choose one DOY and compare **2022 vs 2023** for the same variable.
 
-```{r paired_setup, echo=TRUE, eval=FALSE}
+```{r paired_setup, echo=TRUE, eval=T}
 x1 <- df %>%
-  filter(year_local == 2022, doy > ___ & doy < ___) %>%
+  filter(year_local == 2022, doy > 145 & doy < 165) %>%
   arrange(date) %>%
   pull(target_var)
 
 x2 <- df %>%
-  filter(year_local == 2023, doy > ___ & doy < ___) %>%
+  filter(year_local == 2023, doy > 145 & doy < 165) %>%
   arrange(date) %>%
   pull(target_var)
 
@@ -310,12 +317,13 @@ length(x1); length(x2)
 ```
 
 > Why is this a paired comparison rather than an independent two-sample comparison?
+> *It is paired because the observations are at the exact same time period measured across two different years.*
 
 ---
 
 ## 12) Compute paired differences manually
 
-```{r paired_manual, echo=TRUE, eval=FALSE}
+```{r paired_manual, echo=TRUE, eval=T}
 d <- x1 - x2
 
 dbar <- mean(d, na.rm = TRUE)
@@ -335,16 +343,18 @@ tibble(
 ```
 
 > What does the sign of `dbar` mean?
+> *This means that the ta on those specific days were slightly warmer on average in 2022 compared to 2023.*
 
 ---
 
 ## 13) Compare with `t.test(..., paired = TRUE)`
 
-```{r paired_ttest, echo=TRUE, eval=FALSE}
+```{r paired_ttest, echo=TRUE, eval=T}
 t.test(x1, x2, paired = TRUE)
 ```
 
 > How does the paired t-test differ conceptually from the two-sample t-test?
+> *An independent two-sample t-test compares the overall means of two completely unrelated groups. A paired t-test calculates the difference between paired observations.*
 
 ---
 
@@ -358,13 +368,13 @@ Group `ta` into broad seasonal categories:
 - Winter
 - Other
 
-```{r make_groups_anova, echo=TRUE, eval=FALSE}
+```{r make_groups_anova, echo=TRUE, eval=T}
 df_anova <- df %>%
   filter(!is.na(ta)) %>%
   mutate(
     month_group = case_when(
-      month %in% c(___, ___, ___) ~ "Summer",
-      month %in% c(___, ___, ___) ~ "Winter",
+      month %in% c("Jun", "Jul", "Aug") ~ "Summer",
+      month %in% c("Dec", "Jan", "Feb") ~ "Winter",
       TRUE ~ "Other"
     )
   )
@@ -376,7 +386,7 @@ df_anova %>% count(month_group)
 
 ## 15) Visualize the groups
 
-```{r plot_anova_groups, echo=TRUE, eval=FALSE}
+```{r plot_anova_groups, echo=TRUE, eval=T}
 ggplot(df_anova, aes(x = month_group, y = ta, fill = month_group)) +
   geom_boxplot(alpha = 0.8) +
   theme_classic(base_size = 18) +
@@ -388,12 +398,13 @@ ggplot(df_anova, aes(x = month_group, y = ta, fill = month_group)) +
 ```
 
 > Do the groups look different enough that ANOVA might detect a difference?
+> *Yes. The boxplot enough separation between groups. Because the boxes do not overlap much, this implies the means are far enough apart for ANOVA to detect a difference.*
 
 ---
 
 ## 16) Compute ANOVA components manually
 
-```{r anova_manual_components, echo=TRUE, eval=FALSE}
+```{r anova_manual_components, echo=TRUE, eval=T}
 grand_mean <- mean(df_anova$ta, na.rm = TRUE)
 
 group_stats <- df_anova %>%
@@ -435,17 +446,20 @@ tibble(
 ```
 
 > In your own words, what do `ss_between` and `ss_within` represent?
+> *ss_between: Represents the variation between the different groups.*
+> *ss_within: Represents the normal variation within each group.*
 
 ---
 
 ## 17) Compare with `aov()`
 
-```{r run_anova, echo=TRUE, eval=FALSE}
+```{r run_anova, echo=TRUE, eval=T}
 model <- aov(ta ~ month_group, data = df_anova)
 summary(model)
 ```
 
 > What does the ANOVA p-value tell you? Does it tell you which groups differ?
+> *This p-value tells me that at least one of the seasonal group mean is significantly different from the others.*
 
 ---
 
@@ -458,7 +472,7 @@ Answer in **5–7 sentences**:
 - How is ANOVA a generalization of the t-test?
 - What stayed the same across all these tests?
 
-> *Write your answer here.*
+> *A one-sample t-test compares a single group mean to a hypothesized value, whereas a two-sample t-test compares the means of two entirely independent groups. A paired t-test is unique because it analyzes dependent data. ANOVA serves as a generalization of the t-test, allowing us to compare means across three or more groups simultaneously without inflating our error rate. The logic stayed the exact same across all these tests by calculating a test statistic and then comparing the estimated effect size against the data uncertainty.*
 
 ---
 
