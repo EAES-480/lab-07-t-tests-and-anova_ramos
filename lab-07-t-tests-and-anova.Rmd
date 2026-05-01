@@ -15,6 +15,8 @@ editor_options:
   chunk_output_type: inline
 ---
 
+GRADE GM: 10/10 - Very strong submission! Clean code, thoughtful interpretations, excellent visualizations, and a solid reflection. Excellent work!
+
 ```{r setup, echo=FALSE, message=FALSE, warning=T}
 library(tidyverse)
 library(lubridate)
@@ -174,6 +176,8 @@ tibble(
 > What does the p-value suggest about your null hypothesis?
 > *The p-value is extremely small, so I can reject the null hypothesis. This suggests that the true mean ta is statistically significantly different from my hypothesized value of 11.*
 
+> GM: Excellent — Clear rejection of null and correct interpretation.
+
 ---
 
 ## 5) Compare with `t.test()`
@@ -294,6 +298,8 @@ ggplot(plot_df, aes(x = group, y = value, fill = group)) +
 > Does the plot match your statistical conclusion?
 > *Yes. The boxplot shows that the summer box is higher on the y-axis than the spring box, with almost no overlap. This visual separation confirms the significant difference detected by the t-test.*
 
+> GM: Excellent — Strong tie between plot and statistical conclusion.
+
 ---
 
 # Part III — Paired t-test
@@ -355,6 +361,8 @@ t.test(x1, x2, paired = TRUE)
 
 > How does the paired t-test differ conceptually from the two-sample t-test?
 > *An independent two-sample t-test compares the overall means of two completely unrelated groups. A paired t-test calculates the difference between paired observations.*
+
+> GM: Excellent — Clean and accurate conceptual distinction.
 
 ---
 
@@ -473,6 +481,8 @@ Answer in **5–7 sentences**:
 - What stayed the same across all these tests?
 
 > *A one-sample t-test compares a single group mean to a hypothesized value, whereas a two-sample t-test compares the means of two entirely independent groups. A paired t-test is unique because it analyzes dependent data. ANOVA serves as a generalization of the t-test, allowing us to compare means across three or more groups simultaneously without inflating our error rate. The logic stayed the exact same across all these tests by calculating a test statistic and then comparing the estimated effect size against the data uncertainty.*
+
+> GM: Excellent — Very good summary of the key differences and common logic.
 
 ---
 
